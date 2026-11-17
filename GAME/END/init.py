@@ -9,7 +9,7 @@ L_screen, H_screen = 1280, 800
 
 # Limites de déplacement
 limite_gauche = 0
-limite_droite = L_screen - 30
+limite_droite = L_screen - 80
 limite_bas = H_screen - 15
 
 # Initialisation du jeu

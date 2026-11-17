@@ -52,7 +52,7 @@ def main(clock, running):
     spawn_timer = 0
     # TODO intergrer dans ennemi manager
     ennemis = []
-    ennemis.extend(init_ennemy())
+    ennemis.extend(init_ennemy()) # ajouter un ennemi au début du jeu sans imbriquer la liste (déconstruction des itérables pour instertion)
 
     while running:
 
