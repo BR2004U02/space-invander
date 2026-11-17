@@ -8,11 +8,13 @@ from pygame import mixer
 clock = pygame.time.Clock()  # gère les fps
 running = True  # variable on/off
 
-#TODO ranger les variables
+screen = pygame.display.set_mode((L_screen, H_screen))
 
 
-def main(clock, running):
-    # création envirronement
+def main(clock, running, screen):
+
+
+
     pygame.init()
     print("Audio :", pygame.mixer.get_init())
 

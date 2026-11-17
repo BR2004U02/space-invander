@@ -25,7 +25,7 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 
 4 affichage ennemi ✅ => ajoute la boucle "spawn ennemi" + déplacment ✅ 
 
-5 collision balle / ennemi ❌ 
+5 collision balle / ennemi ✅
 
 **
 "=>" signifie "à implémenter"
