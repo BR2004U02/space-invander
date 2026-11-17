@@ -42,6 +42,12 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 ## ROMEO
 
 1 bullet + tire ✅   
+- Centrage des 2 bullets et hitboxs indépendantes
+- Ajout du Game Over et de la barre de santé
+- Ajout du score dynamique (naturel et ennemis détruits)
+- Avion réagit au mouvement (chargement images tilt_left/right)
+- Ajout sfx et musique de fond
+- Ajout test_fps pour vérifier les performances du jeu
 
 ## TODO 
 1) separer l'affichage du main
@@ -50,7 +56,7 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 3) separer constante et variable 
 
 ## TODO ++
-1) ajouter un barre de vie
+1) ajouter un barre de vie -> Done
 2) permettre aux ennemi de tirer 
 3) BONUS in game
 4) obstacle
@@ -60,4 +66,4 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 8) barre de vie ennemi
 9) arme différente
 10) perso  différents
-11) animation
+11) animation -> Done pour l'avion

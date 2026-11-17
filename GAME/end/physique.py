@@ -2,17 +2,31 @@ import pygame
 from pygame import mixer
 
 
-def collision(bullets,ennemies,explosionSound):
-    
-    for bullet in bullets:
-        for ennemi in ennemies:
+def collision_bullets_ennemies(bullets, ennemis, explosionSound):
+
+    ennemis_detruits = 0 # comptage score
+
+    for bullet in bullets[:]:
+        for ennemi in ennemis[:]:
             if bullet.hitbox.colliderect(ennemi.hitbox):
-                #recuperer la position de la collision
-                collision_xy = bullet.hitbox.clip(ennemi.hitbox) #IA
-                x = collision_xy.centerx
-                y = collision_xy.centery
-                #animations
+
                 explosionSound.play()
-                
                 bullets.remove(bullet)
-                ennemies.remove(ennemi)
+                ennemis.remove(ennemi)
+
+                ennemis_detruits += 1
+                break
+
+    return ennemis_detruits
+
+def collision_ennemi_bas(ennemis, limite_bas, explosionSound):
+
+    vies_perdues = 0
+
+    for ennemi in ennemis[:]:
+        if ennemi.hitbox.bottom >= limite_bas:
+            explosionSound.play()
+            ennemis.remove(ennemi)
+            vies_perdues += 1
+
+    return vies_perdues

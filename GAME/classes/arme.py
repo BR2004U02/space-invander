@@ -40,14 +40,14 @@ class Weapon:
         self.bullets = []
 
         self.last_shot = 0
-        self.shoot_delay = 400 # firerate (en millisecondes)
+        self.shoot_delay = 600 # firerate (en millisecondes)
 
     def create_2_bullets(self, x, y):
         bullet1 = Bullet(self.screen)
         bullet2 = Bullet(self.screen)
 
-        bullet1.fire(x, y)
-        bullet2.fire(x + 60, y)
+        bullet1.fire(x - 5, y)
+        bullet2.fire(x + 55, y)
 
         self.bullets.append(bullet1)
         self.bullets.append(bullet2)

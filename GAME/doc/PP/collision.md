@@ -26,3 +26,10 @@ Constante:
 
 - resultat de la fonction main " verifier collision"
 - remplacer l'element ennemi toucher de la liste "Ennemies" par None
+
+COLLISION ENNEMI - BAS DE L'ÉCRAN 
+
+- si hauteur_ennemi <= 0 (bas de l'écran):
+    disparître ennmie et -1 vie au joueur
+- si 3 collision:
+    Game Over
