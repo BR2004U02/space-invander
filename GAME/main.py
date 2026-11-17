@@ -155,4 +155,4 @@ def main(clock, running, screen):
 
 if __name__ == "__main__":
     # ?? le menu devra lancer cette fonction avec un button "jouer"
-    main(clock, running)
+    main(clock, running, screen)
