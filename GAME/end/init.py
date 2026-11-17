@@ -1,6 +1,6 @@
 
 import pygame
-from classes.player import Avion,images
+from classes.player import Avion,images_avion
 from classes.ennemi import Extra
 import random
 
@@ -27,15 +27,17 @@ def init_game():
 def init_player():
 
     images_chargees = {}
-    for nom, fichier in images.items():
+    for nom, fichier in images_avion.items():
         image = pygame.image.load("GAME/assets/" + fichier).convert_alpha()
+        #TODO attribuer 150 à une variable
         images_chargees[nom] = pygame.transform.scale(image, (150, 150))
-
+    #TODO ne pas faire des calcul dans l'attribution de joueur, utiliser des variable nommées
+    # TODO pour une meilleur relecture et garder un format de code unifier !!!
     joueur = Avion(
         (L_screen - 150) // 2,
         H_screen - 150,
         0,
-        0,
+        None,
         L_screen - 150,
         images_chargees
     )
@@ -50,13 +52,15 @@ def init_ennemy():
     ennemis = []
     enemyX = random.randint(limite_gauche, limite_droite - 80)
     enemyY = 50
+    # demarre vers la gauche ou la droite
     direction = random.choice([-1, 1])
+    vitesse_descente = 0.5
 
     ennemi = Extra(
         enemyX, enemyY,
         limite_gauche, limite_droite, limite_bas,
-        enemyImg, direction, 1
-    )
+        enemyImg, direction, vitesse_descente
+    ) # 1 ???
 
     ennemis.append(ennemi)
     return ennemis
