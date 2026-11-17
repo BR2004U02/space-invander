@@ -1,8 +1,8 @@
 import pygame
 from classes.arme import Weapon
-from END.init import init_game, init_player, init_ennemy, init_vie, init_score, L_screen, H_screen
-from END.affichage import afficher_score, afficher_vie, game_over
-from END.physique import collision_bullets_ennemies, collision_ennemi_bas
+from end.init import init_game, init_player, init_ennemy, init_vie, init_score, L_screen, H_screen
+from end.affichage import afficher_score, afficher_vie, game_over
+from end.physique import collision_bullets_ennemies, collision_ennemi_bas
 from pygame import mixer
 
 clock = pygame.time.Clock()  # gère les fps
