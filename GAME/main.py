@@ -39,6 +39,9 @@ def main(clock, running, screen):
     soundGameOver.set_volume(0.5)
 
     background = init_game()  
+    background_y1 = 0
+    background_y2 = -H_screen # pour le déroulement
+
     joueur = init_player()
     vies, max_vies, largeur, hauteur, x, y = init_vie()
     score, font = init_score()
@@ -51,8 +54,8 @@ def main(clock, running, screen):
     spawn_timer = 0
     # TODO intergrer dans ennemi manager
     ennemis = []
-    # extend
-    ennemis.extend(init_ennemy())
+    ennemis.extend(init_ennemy()) # ajouter un ennemi au début du jeu sans imbriquer la liste (déconstruction des itérables pour instertion)
+
 
     while running:
 
@@ -73,7 +76,18 @@ def main(clock, running, screen):
             score += 1
 
         ## ----------- AFFICHAGE -----------
-        screen.blit(background, (0, 0))  # fond
+        # background défilant entre 2 images continues
+        background_y1 += 2
+        background_y2 += 2
+
+        if background_y1 >= H_screen:
+            background_y1 = -H_screen
+
+        if background_y2 >= H_screen:
+            background_y2 = -H_screen
+
+        screen.blit(background, (0, background_y1))
+        screen.blit(background, (0, background_y2))
         ### JOUEUR ###
         joueur.afficher(screen)  # player
         ### ENNEMI ###
@@ -142,4 +156,4 @@ def main(clock, running, screen):
 
 if __name__ == "__main__":
     # ?? le menu devra lancer cette fonction avec un button "jouer"
-    main(clock, running,screen)
+    main(clock, running, screen)
