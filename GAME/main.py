@@ -6,10 +6,6 @@ from pygame import mixer
 
 clock = pygame.time.Clock()  # gere les fps
 running = True  # variable on/off
-
-#TODO ranger les variables
-
-
 screen = pygame.display.set_mode((L_screen, H_screen))
 
 

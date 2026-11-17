@@ -15,8 +15,7 @@ limite_haut = 0
 
 
 def init_game():
-
-    
+   
     back = pygame.image.load("GAME/assets/background.png")
     background = pygame.transform.scale(back, (L_screen, H_screen))  # IA
 
@@ -24,8 +23,8 @@ def init_game():
 
 
 def init_player():
+    
     playerImg = pygame.image.load("GAME/assets/player.png").convert_alpha()
-
     playerImg = pygame.transform.scale(playerImg, (150, 150))  # IA
     joueur_x = L_screen // 2 
     joueur_y = H_screen * 0.8
