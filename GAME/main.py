@@ -56,6 +56,7 @@ def main(clock, running, screen):
     ennemis = []
     ennemis.extend(init_ennemy()) # ajouter un ennemi au début du jeu sans imbriquer la liste (déconstruction des itérables pour instertion)
 
+
     while running:
 
         dt = clock.tick(60)

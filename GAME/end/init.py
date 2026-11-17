@@ -1,6 +1,6 @@
 
 import pygame
-from classes.player import Avion
+from classes.player import Avion,images
 from classes.ennemi import Extra
 import random
 
@@ -25,23 +25,11 @@ def init_game():
 
 # Initialisation du joueur
 def init_player():
-    images = {
-        "normal": "player.png",
-        "normal_left": "player_tilt_left.png",
-        "normal_right": "player_tilt_right.png",
 
-        "damaged": "player_damaged.png",
-        "damaged_left": "player_damaged_tilt_left.png",
-        "damaged_right": "player_damaged_tilt_right.png",
-
-        "critical": "player_critical.png",
-        "critical_left": "player_critical_tilt_left.png",
-        "critical_right": "player_critical_tilt_right.png"
-    }
-
-    for nom in images:
-        image = pygame.image.load("GAME/assets/" + images[nom]).convert_alpha()
-        images[nom] = pygame.transform.scale(image, (150, 150))
+    images_chargees = {}
+    for nom, fichier in images.items():
+        image = pygame.image.load("GAME/assets/" + fichier).convert_alpha()
+        images_chargees[nom] = pygame.transform.scale(image, (150, 150))
 
     joueur = Avion(
         (L_screen - 150) // 2,
@@ -49,7 +37,7 @@ def init_player():
         0,
         0,
         L_screen - 150,
-        images
+        images_chargees
     )
 
     return joueur
