@@ -51,6 +51,7 @@ def main(clock, running, screen):
     spawn_timer = 0
     # TODO intergrer dans ennemi manager
     ennemis = []
+    # extend
     ennemis.extend(init_ennemy())
 
     while running:
@@ -141,4 +142,4 @@ def main(clock, running, screen):
 
 if __name__ == "__main__":
     # ?? le menu devra lancer cette fonction avec un button "jouer"
-    main(clock, running)
+    main(clock, running,screen)
