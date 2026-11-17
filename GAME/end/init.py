@@ -54,7 +54,7 @@ def init_ennemy():
     enemyY = 50
     # demarre vers la gauche ou la droite
     direction = random.choice([-1, 1])
-    vitesse_descente = 0.5
+    vitesse_descente = 1
 
     ennemi = Extra(
         enemyX, enemyY,
