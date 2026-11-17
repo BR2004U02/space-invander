@@ -16,7 +16,10 @@ limite_bas = H_screen - 15
 def init_game():
     screen = pygame.display.set_mode((L_screen, H_screen))
     pygame.display.set_caption("Space Invaders")
+
     background = pygame.image.load("GAME/assets/background.png").convert()
+    background_y1 = 0
+    background_y2 = -H_screen # background défilants
     background = pygame.transform.scale(background, (L_screen, H_screen))
     return background
 
