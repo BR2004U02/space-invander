@@ -3,7 +3,7 @@ from classes.arme import Weapon
 from end.init import init_game, init_player, init_ennemy, init_vie, init_score, L_screen, H_screen
 from end.affichage import afficher_score, afficher_vie, game_over
 from end.physique import collision_bullets_ennemies, collision_ennemi_bas
-from pygame import mixer
+from asset_paths import MUSIC, SFX
 
 clock = pygame.time.Clock()  # gère les fps
 running = True  # variable on/off
@@ -12,7 +12,6 @@ screen = pygame.display.set_mode((L_screen, H_screen))
 
 
 def main(clock, running, screen):
-
 
 
     pygame.init()
@@ -24,18 +23,18 @@ def main(clock, running, screen):
     pygame.mixer.init()
 
     # Musique de fond
-    pygame.mixer.music.load("GAME/assets/pvz.mp3")
+    pygame.mixer.music.load(MUSIC + "/pvz.mp3")
     pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.play(-1)
 
     # bruitages
-    explosionSound = pygame.mixer.Sound("GAME/assets/boom2.wav")
+    explosionSound = pygame.mixer.Sound(SFX + "/boom2.wav")
     explosionSound.set_volume(0.1)
 
-    hitSound = pygame.mixer.Sound("GAME/assets/roblox.wav")
+    hitSound = pygame.mixer.Sound(SFX + "/roblox.wav")
     hitSound.set_volume(0.5)
 
-    soundGameOver = pygame.mixer.Sound("GAME/assets/gameover.wav")
+    soundGameOver = pygame.mixer.Sound(SFX + "/gameover.wav")
     soundGameOver.set_volume(0.5)
 
     background = init_game()  

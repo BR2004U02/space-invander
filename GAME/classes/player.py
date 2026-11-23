@@ -44,11 +44,11 @@ class Avion(Player):
             etat = "critical"
 
         if direction == -1:
-            self.playerImg = self.images[etat + "_left"]
+            self.playerImg = self.images[etat + "_left"] # tilt_left
         elif direction == 1:
-            self.playerImg = self.images[etat + "_right"]
+            self.playerImg = self.images[etat + "_right"] # //
         else:
-            self.playerImg = self.images[etat]
+            self.playerImg = self.images[etat] # aucun tilt
 
     # TODO mettre dans class Player
     def afficher(self, screen):

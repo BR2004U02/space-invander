@@ -4,12 +4,13 @@
 
 
 import pygame
+from asset_paths import PROJECTILE
 
 
 class Bullet:
     def __init__(self, screen):
         self.screen = screen
-        self.image = pygame.image.load('./GAME/assets/bullet.png')
+        self.image = pygame.image.load(PROJECTILE + "/bullet.png")
         self.x = 0
         self.y = 0
         self.speed = 10 # !! négatif car on remonte la page

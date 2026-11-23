@@ -48,10 +48,15 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 - Avion réagit au mouvement (chargement images tilt_left/right)
 - Ajout sfx et musique de fond
 - Ajout test_fps pour vérifier les performances du jeu
+- PNG dynamiques en fonction des dégâts (joueurs/ennemies)
+
+## Utilisation IA
+- Modèles ennemis / joueurs (inclinaisons, stades de dégâts, ...)
+- Correction bug -> fréquence d'image réduit (problème => chargement constant des images à chaque ticks)
 
 ## TODO 
 1) separer l'affichage du main
-1) ranger assets
+1) ranger assets -> fichier asset_paths.py crée et sous-dossiers organisés
 2) optimiser le code à l'aide de décorateur et autre matiere vue en cours
 3) separer constante et variable 
 
@@ -65,5 +70,4 @@ le fichier init doit permmetre d initialiser la class parents, les sous class so
 7) ennemi different
 8) barre de vie ennemi
 9) arme différente
-10) perso  différents
 11) animation -> Done pour l'avion

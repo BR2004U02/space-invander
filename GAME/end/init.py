@@ -2,6 +2,7 @@
 import pygame
 from classes.player import Avion,images_avion
 from classes.ennemi import Extra
+from asset_paths import BACKGROUND, PLAYER, ENEMY
 import random
 
 # Dimensions de la fenêtre
@@ -17,7 +18,7 @@ def init_game():
     screen = pygame.display.set_mode((L_screen, H_screen))
     pygame.display.set_caption("Space Invaders")
 
-    background = pygame.image.load("GAME/assets/background.png").convert()
+    background = pygame.image.load(BACKGROUND + "/background.png").convert()
     background_y1 = 0
     background_y2 = -H_screen # background défilants
     background = pygame.transform.scale(background, (L_screen, H_screen))
@@ -28,7 +29,7 @@ def init_player():
 
     images_chargees = {}
     for nom, fichier in images_avion.items():
-        image = pygame.image.load("GAME/assets/" + fichier).convert_alpha()
+        image = pygame.image.load(PLAYER + "/" + fichier).convert_alpha()
         #TODO attribuer 150 à une variable
         images_chargees[nom] = pygame.transform.scale(image, (150, 150))
     #TODO ne pas faire des calcul dans l'attribution de joueur, utiliser des variable nommées
@@ -46,7 +47,7 @@ def init_player():
 
 # Initialisation des ennemis
 def init_ennemy():
-    enemyImg = pygame.image.load("GAME/assets/enemy.png").convert_alpha()
+    enemyImg = pygame.image.load(ENEMY + "/enemy.png").convert_alpha()
     enemyImg = pygame.transform.scale(enemyImg, (80, 80))
 
     ennemis = []
