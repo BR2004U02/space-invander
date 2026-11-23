@@ -1,104 +1,65 @@
 import pygame
-from classes.arme import Weapon
-from end.init import init_game, init_player, init_ennemy, init_vie, init_score, L_screen, H_screen
+from jeu import Partie
+from end.audio import Sons
+from end.init import init_ennemy, L_screen, H_screen
 from end.affichage import afficher_score, afficher_vie, game_over
 from end.physique import collision_bullets_ennemies, collision_ennemi_bas
-from asset_paths import MUSIC, SFX
-
-clock = pygame.time.Clock()  # gère les fps
-running = True  # variable on/off
-
-screen = pygame.display.set_mode((L_screen, H_screen))
 
 
-def main(clock, running, screen):
+def main():
 
-
+    ## ----------- DEMARRAGE -----------
     pygame.init()
-    print("Audio :", pygame.mixer.get_init())
-
     screen = pygame.display.set_mode((L_screen, H_screen))
+    pygame.display.set_caption("Space Invaders")
 
-    # Initialisation du son
-    pygame.mixer.init()
+    sons = Sons()
+    partie = Partie(screen)
 
-    # Musique de fond
-    pygame.mixer.music.load(MUSIC + "/pvz.mp3")
-    pygame.mixer.music.set_volume(0.3)
-    pygame.mixer.music.play(-1)
-
-    # bruitages
-    explosionSound = pygame.mixer.Sound(SFX + "/boom2.wav")
-    explosionSound.set_volume(0.1)
-
-    hitSound = pygame.mixer.Sound(SFX + "/roblox.wav")
-    hitSound.set_volume(0.5)
-
-    soundGameOver = pygame.mixer.Sound(SFX + "/gameover.wav")
-    soundGameOver.set_volume(0.5)
-
-    background = init_game()  
-    background_y1 = 0
-    background_y2 = -H_screen # pour le déroulement
-
-    joueur = init_player()
-    vies, max_vies, largeur, hauteur, x, y = init_vie()
-    score, font = init_score()
-    score_timer = 0
-    bonus_timer = 0 # ennemi touché +50 points affiché pendant 1 seconde
-    bonus_alpha = 0 # transparence
-
-    # création des armes
-    weapons = Weapon(screen)
-    spawn_timer = 0
-    # TODO intergrer dans ennemi manager
-    ennemis = []
-    ennemis.extend(init_ennemy()) # ajouter un ennemi au début du jeu sans imbriquer la liste (déconstruction des itérables pour instertion)
-
+    clock = pygame.time.Clock()  # gere les fps
+    running = True               # variable on/off
 
     while running:
 
         dt = clock.tick(60)
-        print(clock.get_fps()) # checker performances
-        print(pygame.display.get_driver())
-        
+
         ## ----------- PYGAME -----------
-        spawn_timer += dt # timer
-        for event in pygame.event.get(): # gestion des événements
+        partie.spawn_timer += dt # timer
+        for event in pygame.event.get(): # gestion des evenements
             if event.type == pygame.QUIT:
                 running = False
 
         ## ----------- SCORE -----------
-        score_timer += dt
-        if score_timer > 50: 
-            score_timer = 0
-            score += 1
+        partie.score_timer += dt
+        if partie.score_timer > 50:
+            partie.score_timer = 0
+            partie.score += 1
 
         ## ----------- AFFICHAGE -----------
-        # background défilant entre 2 images continues
-        background_y1 += 2
-        background_y2 += 2
+        # background defilant entre 2 images continues
+        partie.background_y1 += 2
+        partie.background_y2 += 2
 
-        if background_y1 >= H_screen:
-            background_y1 = -H_screen
+        if partie.background_y1 >= H_screen:
+            partie.background_y1 = -H_screen
 
-        if background_y2 >= H_screen:
-            background_y2 = -H_screen
+        if partie.background_y2 >= H_screen:
+            partie.background_y2 = -H_screen
 
-        screen.blit(background, (0, background_y1))
-        screen.blit(background, (0, background_y2))
+        screen.blit(partie.background, (0, partie.background_y1))
+        screen.blit(partie.background, (0, partie.background_y2))
         ### JOUEUR ###
-        joueur.afficher(screen)  # player
+        partie.joueur.afficher(screen)  # player
         ### ENNEMI ###
-        if spawn_timer > 500:  # 500 ms = 0.5 sec
-            spawn_timer = 0
-            ennemis.extend(init_ennemy())
-        for e in ennemis: 
+        if partie.spawn_timer > 500:  # 500 ms = 0.5 sec
+            partie.spawn_timer = 0
+            partie.ennemis.extend(init_ennemy())
+        for e in partie.ennemis:
             e.afficher(screen)
             e.move()
 
         ## ----------- AFFICHAGE SCORE-----------
-        afficher_score(screen, score, font, bonus_alpha)
+        afficher_score(screen, partie.score, partie.font, partie.bonus_alpha)
 
         ## ----------- GESTION DEPLACEMENT JOUEUR -----------
         keys = pygame.key.get_pressed()  # gestion des touches
@@ -107,47 +68,54 @@ def main(clock, running, screen):
 
         if keys[pygame.K_LEFT]:
             direction = -1
-            joueur.move(-1)
+            partie.joueur.move(-1)
 
         elif keys[pygame.K_RIGHT]:
             direction = 1
-            joueur.move(1)
+            partie.joueur.move(1)
 
-        joueur.changer_image(vies, direction)
+        partie.joueur.changer_image(partie.vies, direction)
 
         # Tirs continus
         if keys[pygame.K_SPACE]:
-            weapons.shoot_continuous(joueur.x + 30, joueur.y)
+            partie.weapons.shoot_continuous(partie.joueur.x + 30, partie.joueur.y)
 
-        ## -----------  COLLISION - ENNEMI TOUCHÉ -----------
-        ennemis_detruits = collision_bullets_ennemies(weapons.bullets, ennemis, explosionSound)
-        score += ennemis_detruits * 50
+        ## -----------  COLLISION - ENNEMI TOUCHE -----------
+        ennemis_detruits = collision_bullets_ennemies(
+            partie.weapons.bullets, partie.ennemis, sons.explosion
+        )
+        partie.score += ennemis_detruits * 50
         if ennemis_detruits > 0:
-            bonus_timer = 1000
+            partie.bonus_timer = 1000
 
-        if bonus_timer > 0:
-            bonus_timer -= dt
-            bonus_alpha = int(255 * bonus_timer / 1000)
+        if partie.bonus_timer > 0:
+            partie.bonus_timer -= dt
+            partie.bonus_alpha = int(255 * partie.bonus_timer / 1000)
         else:
-            bonus_alpha = 0
+            partie.bonus_alpha = 0
 
         ## ----------- COLLISION - REDUCTION DE VIE -----------
-        vies -= collision_ennemi_bas(ennemis, H_screen, hitSound)
-        joueur.changer_image(vies, direction)
+        partie.vies -= collision_ennemi_bas(partie.ennemis, H_screen, sons.hit)
+        partie.joueur.changer_image(partie.vies, direction)
 
-        afficher_vie(screen, vies, max_vies, largeur, hauteur, x, y)
+        afficher_vie(
+            screen, partie.vies, partie.max_vies,
+            partie.barre_largeur, partie.barre_hauteur,
+            partie.barre_x, partie.barre_y
+        )
 
-        if vies <= 0:
-            pygame.mixer.music.stop() # stop musique de fond
-            soundGameOver.play() # bruitage game over
-            screen.blit(background, (0, 0))
-            game_over(screen, score)
+        ## ----------- GAME OVER -----------
+        if partie.vies <= 0:
+            sons.stopper_musique()
+            sons.game_over.play()
+            screen.blit(partie.background, (0, 0))
+            game_over(screen, partie.score)
             pygame.display.flip()
             pygame.time.wait(3000)
             running = False
             break
 
-        weapons.update()
+        partie.weapons.update()
         pygame.display.flip()
 
     pygame.quit()
@@ -155,4 +123,4 @@ def main(clock, running, screen):
 
 if __name__ == "__main__":
     # ?? le menu devra lancer cette fonction avec un button "jouer"
-    main(clock, running, screen)
+    main()
