@@ -1,3 +1,5 @@
+# contrôle des collisions
+
 import pygame
 from pygame import mixer
 

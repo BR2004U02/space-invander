@@ -1,4 +1,6 @@
 import pygame
+from classes.entite import Entite
+from config import REFERENCE_FRAME
 
 class Player:
     def __init__(self, x, y, speed, direction, vy, limite_droite):
@@ -9,11 +11,12 @@ class Player:
         self.vy = vy  # deplacement animation
         self.limite_droite = limite_droite
 
-    def move(self, direction):
-        self.x += self.speed * direction
-        self.x = max(0, min(self.x, self.limite_droite)) # min pour droite , max pour gauche
+    def move(self, direction, dt):
+        self.x += self.speed * direction * (dt / REFERENCE_FRAME)
+        self.x = max(0, min(self.x, self.limite_droite))
+        self.hitbox.x = self.x
         
-images_avion ={
+images_avion = {
         "normal": "player.png",
         "normal_left": "player_tilt_left.png",
         "normal_right": "player_tilt_right.png",
@@ -27,14 +30,12 @@ images_avion ={
         "critical_right": "player_critical_tilt_right.png"
     }
 
-class Avion(Player):
+class Avion(Player, Entite):
     def __init__(self, x, y, direction, vy, limite_droite, images):
-        super().__init__(x, y, 8, direction, vy, limite_droite)
-
+        Player.__init__(self, x, y, 8, direction, vy, limite_droite)
         self.images = images
-        self.playerImg = images["normal"]
-        
-      
+        Entite.__init__(self, x, y, images["normal"])
+
     def changer_image(self, vies, direction):
         if vies >= 3:
             etat = "normal"
@@ -44,13 +45,9 @@ class Avion(Player):
             etat = "critical"
 
         if direction == -1:
-            self.playerImg = self.images[etat + "_left"] # tilt_left
+            self.image = self.images[etat + "_left"] # tilt left
         elif direction == 1:
-            self.playerImg = self.images[etat + "_right"] # //
+            self.image = self.images[etat + "_right"] # tilt right
         else:
-            self.playerImg = self.images[etat] # aucun tilt
-
-    # TODO mettre dans class Player
-    def afficher(self, screen):
-        screen.blit(self.playerImg, (self.x, self.y))
+            self.image = self.images[etat] # aucun tilt, normal
    
