@@ -1,5 +1,5 @@
 # arme + balle
-# recuperer la position du canon  pour y tirer la balle correctement positionné 
+# recuperer la position du canon  pour y tirer la balle correctement positionné
 # bonus tirer grace a la souris + viser
 
 
@@ -7,7 +7,7 @@ import pygame
 import math
 
 from classes.entite import Entite
-from config.config import REFERENCE_FRAME
+from config.config import REFERENCE_FRAME, SHURIKEN_AMPLITUDE, SHURIKEN_LONGUEUR
 
 
 class Bullet(Entite):
@@ -35,22 +35,27 @@ class Bullet(Entite):
         if self.state == "fire":
             super().afficher(screen)
 
-class EnemyBullet(Entite): # va vers la position du joueur lors du tir
+
+class EnemyBullet(Entite):  # va vers la position du joueur lors du tir
     def __init__(self, image, x, y, target_x, target_y):
         super().__init__(x, y, image)
-        self.speed = 4 # vitesse de balles ennemies
+        self.speed = 4  # vitesse de balles ennemies
 
-        dx = target_x - x # diff entre balle au début et joueur
+        dx = target_x - x  # diff entre balle au début et joueur
         dy = target_y - y
         distance = math.hypot(dx, dy)
 
-        self.direction_x = dx / distance # direction à prendre
+        self.direction_x = dx / distance  # direction à prendre
         self.direction_y = dy / distance
 
-        self.hitbox = self.hitbox.inflate(-17, -17) # à changer si trop faicile/compliqué à esquiver les tirs ennemis
+        self.hitbox = self.hitbox.inflate(
+            -17, -17
+        )  # à changer si trop faicile/compliqué à esquiver les tirs ennemis
 
     def update(self, dt):
-        self.x += self.direction_x * self.speed * (dt / REFERENCE_FRAME) # déplacemeent (vecteur de déplacement)
+        self.x += (
+            self.direction_x * self.speed * (dt / REFERENCE_FRAME)
+        )  # déplacemeent (vecteur de déplacement)
         self.y += self.direction_y * self.speed * (dt / REFERENCE_FRAME)
 
         self.hitbox.x = self.x
@@ -67,7 +72,7 @@ class Weapon:
         self.bullets = []
 
         self.last_shot = 0
-        self.shoot_delay = 600 # firerate (en millisecondes)
+        self.shoot_delay = 600  # firerate (en millisecondes)
 
     def create_2_bullets(self, x, y):
 
@@ -97,12 +102,41 @@ class Weapon:
         for bullet in self.bullets:
             bullet.afficher(screen)
 
+
+class Shuriken(Bullet):
+    """Monte comme une balle, mais en suivant une courbe."""
+
+    def __init__(self, image, sens):
+        super().__init__(image)
+        self.sens = sens              # -1 : part vers la gauche, 1 : vers la droite
+        self.x_depart = 0
+        self.y_depart = 0
+
+    def fire(self, x, y):
+        super().fire(x, y)
+        self.x_depart = x
+        self.y_depart = y
+
+    def update(self, dt):
+        super().update(dt)            # la montée est celle de Bullet
+        distance = self.y_depart - self.y
+        self.x = self.x_depart + self.sens * SHURIKEN_AMPLITUDE * math.sin(distance / SHURIKEN_LONGUEUR)
+        self.hitbox.x = self.x
+
+
+class WeaponShuriken(Weapon):
+    def create_2_bullets(self, x, y):
+        for sens in (-1, 1):          # deux shurikens qui se croisent
+            shuriken = Shuriken(self.bullet_image, sens)
+            shuriken.fire(x + 45 - shuriken.hitbox.width // 2, y)   # centre de l'avion
+            self.bullets.append(shuriken)
+
 class EnemyWeapon:
     def __init__(self, bullet_image):
         self.bullet_image = bullet_image
         self.bullets = []
         self.last_shot = 0
-        self.shoot_delay = 5000 # délai entre les tirs 
+        self.shoot_delay = 5000  # délai entre les tirs
 
     def shoot(self, x, y, player):
         current_time = pygame.time.get_ticks()
@@ -110,9 +144,10 @@ class EnemyWeapon:
         if current_time - self.last_shot >= self.shoot_delay:
             bullet = EnemyBullet(
                 self.bullet_image,
-                x, y,
+                x,
+                y,
                 player.x + player.hitbox.width / 2,
-                player.y + player.hitbox.height / 2
+                player.y + player.hitbox.height / 2,
             )
 
             self.bullets.append(bullet)

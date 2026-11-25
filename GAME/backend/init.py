@@ -34,7 +34,10 @@ def charger_images():
         enemy_bullet_img, (20, 30)
     )
 
-    return enemy_images, bullet_img, enemy_bullet_img
+    # projectile de la seconde arme du joueur
+    shuriken_img = pygame.image.load(PROJECTILE + "/shuriken.png").convert_alpha()
+
+    return enemy_images, bullet_img, enemy_bullet_img, shuriken_img
 
 # Initialisation du jeu
 def init_game():

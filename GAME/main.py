@@ -28,12 +28,13 @@ def main():
         for event in pygame.event.get():  # gestion des evenements
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                partie.changer_arme()
 
         ## ----------- GESTION DEPLACEMENT JOUEUR -----------
         keys = pygame.key.get_pressed()  # gestion des touches
 
         # Deplacement  + tir
-        direction, tir = lire_clavier()
         direction, tir = lire_clavier()
 
         partie.joueur.move(direction, dt)

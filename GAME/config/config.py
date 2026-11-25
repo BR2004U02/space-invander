@@ -46,3 +46,6 @@ GREEN = (0, 255, 0)
 # Jeu
 FPS = 60
 REFERENCE_FRAME = 1000 / FPS # 16.67 ms par frame
+
+SHURIKEN_AMPLITUDE = 120    # largeur de la courbe, en pixels
+SHURIKEN_LONGUEUR = 80      # plus c'est grand, plus la courbe est étirée

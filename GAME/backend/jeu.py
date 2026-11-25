@@ -1,5 +1,6 @@
 import pygame
 from classes.arme import Weapon
+from classes.arme import Weapon, WeaponShuriken
 from classes.fond import Fond
 from classes.score import Score
 from classes.barre_de_vie import BarreDeVie
@@ -14,7 +15,7 @@ class Partie:
 
     def __init__(self, sons):
 
-        self.enemy_images, self.bullet_images, self.enemy_bullet_images = charger_images() # charger les images une seule fois
+        self.enemy_images, self.bullet_images, self.enemy_bullet_images, self.shuriken_image = charger_images() # charger les images une seule fois
 
         # Fond défilant (deux copies qui se suivent)
         self.fond = Fond()
@@ -36,8 +37,9 @@ class Partie:
         self.score = Score()
 
         # Armes
-        self.weapons = Weapon(self.bullet_images)
-
+        self.armes = [Weapon(self.bullet_images), WeaponShuriken(self.shuriken_image)]
+        self.index_arme = 0
+        self.weapons = self.armes[0]          # l'arme en main
         # Ennemis
         self.ennemi_manager = EnnemiManager(
         self.enemy_images,
@@ -47,7 +49,13 @@ class Partie:
             init_ennemy(self.enemy_images, self.enemy_bullet_images, self.score.value)
         )
         
+        
+    def changer_arme(self):
+        self.index_arme = (self.index_arme + 1) % len(self.armes)
+        self.weapons = self.armes[self.index_arme]  
         self.game_over_screen = game_over_screen
+        
+        
     def update(self, dt):
         # Mise à jour du décor
         self.fond.update(dt)
@@ -59,7 +67,8 @@ class Partie:
         self.ennemi_manager.update(dt, self.joueur, self.score.value)
 
         # Mise à jour des projectiles
-        self.weapons.update(dt)
+        for arme in self.armes:
+            arme.update(dt)
 
         # Invulnérabilité
         self.temps_invulnerable = max(
@@ -98,15 +107,18 @@ class Partie:
         self.barre_vie.afficher(screen)
 
         # Projectiles
-        self.weapons.afficher(screen)
+        for arme in self.armes:
+            arme.afficher(screen)
 
     def gerer_collisions(self):
         # Collision entre les projectiles et les ennemis
-        ennemis_detruits = collision_bullets_ennemies(
-            self.weapons.bullets,
+        ennemis_detruits = 0
+        for arme in self.armes:
+            ennemis_detruits += collision_bullets_ennemies(
+            arme.bullets,
             self.ennemi_manager.ennemis,
             self.sons.explosion
-        )
+            )
 
         self.score.ajouter_points(ennemis_detruits)
 
