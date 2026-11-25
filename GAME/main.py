@@ -1,8 +1,9 @@
 import pygame
-from jeu import Partie
-from end.audio import Sons
-from config import L_SCREEN, H_SCREEN
-from end.affichage import game_over
+from backend.jeu import Partie
+from backend.audio import Sons
+from config.config import L_SCREEN, H_SCREEN
+from frontend.affichage import game_over_screen
+from backend.controle import lire_clavier
 
 
 def main():
@@ -17,59 +18,38 @@ def main():
     partie = Partie(sons)
 
     clock = pygame.time.Clock()  # gere les fps
-    running = True               # variable on/off
+    running = True  # variable on/off
 
     while running:
 
         dt = clock.tick(60)
 
         ## ----------- PYGAME -----------
-        for event in pygame.event.get(): # gestion des evenements
+        for event in pygame.event.get():  # gestion des evenements
             if event.type == pygame.QUIT:
                 running = False
 
         ## ----------- GESTION DEPLACEMENT JOUEUR -----------
         keys = pygame.key.get_pressed()  # gestion des touches
 
-        # Deplacement continu
+        # Deplacement  + tir
+        direction, tir = lire_clavier()
+        direction, tir = lire_clavier()
 
-        direction = 0
-
-        if keys[pygame.K_LEFT]:
-            direction = -1
-            partie.joueur.move(-1, dt)
-
-        elif keys[pygame.K_RIGHT]:
-            direction = 1
-            partie.joueur.move(1, dt)
+        partie.joueur.move(direction, dt)
 
         partie.joueur.changer_image(partie.barre_vie.vies, direction)
 
-        # Tirs continus
-        if keys[pygame.K_SPACE]:
-            partie.weapons.shoot_continuous(
-                partie.joueur.x + 30,
-                partie.joueur.y
-            )
+        if tir:
+            partie.weapons.shoot_continuous(partie.joueur.x + 30, partie.joueur.y)
 
         ## ----------- MISE A JOUR ET AFFICHAGE -----------
         partie.update(dt)
 
         ## ----------- GAME OVER -----------
-        if partie.barre_vie.vies <= 0:
-            sons.stopper_musique()
-            sons.game_over.play()
-
-            partie.fond.afficher(screen)
-            game_over(screen, partie.score.value)
-
-            pygame.display.flip()
-            pygame.time.wait(3000)
-
-            running = False
-            break
-
         partie.dessiner(screen)
+        if partie.game_over(screen, sons):
+            break
         pygame.display.flip()
 
     pygame.quit()

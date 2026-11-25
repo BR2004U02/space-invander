@@ -1,5 +1,5 @@
-from end.init import init_game
-from config import H_SCREEN, BACKGROUND_SPEED, REFERENCE_FRAME
+from backend.init import init_game
+from config.config import H_SCREEN, BACKGROUND_SPEED, REFERENCE_FRAME
 
 
 class Fond:

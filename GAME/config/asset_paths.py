@@ -1,7 +1,6 @@
 '''
 Plus facile de retrouver les chemins d'accès 
 '''
-
 # Racine
 ASSETS = "GAME/assets"
 

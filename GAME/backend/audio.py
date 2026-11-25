@@ -1,5 +1,5 @@
 import pygame
-from asset_paths import MUSIC, SFX
+from config.asset_paths import MUSIC, SFX
 
 
 class Sons:

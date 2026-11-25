@@ -1,7 +1,7 @@
 
 import pygame
 
-from config import (
+from config.config import (
     SCORE_UPDATE_DELAY,
     ENEMY_POINTS,
     SCORE_FONT_SIZE,
@@ -11,7 +11,7 @@ from config import (
     WHITE,
     GREEN
 )
-
+#TODO integrer a player + separer affichage ???
 
 class Score:
     def __init__(self):

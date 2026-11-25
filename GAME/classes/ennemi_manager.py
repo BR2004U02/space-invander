@@ -1,5 +1,5 @@
-from end.init import init_ennemy
-from config import ENEMY_SPAWN_DELAY
+from backend.init import init_ennemy
+from config.config import ENEMY_SPAWN_DELAY
 
 
 class EnnemiManager:

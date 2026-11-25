@@ -1,6 +1,6 @@
 import pygame
 
-from config import (
+from config.config import (
     PLAYER_MAX_LIVES,
     LIFE_BAR_WIDTH,
     LIFE_BAR_HEIGHT,

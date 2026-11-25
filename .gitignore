@@ -1,5 +1,15 @@
+# Environnement virtuel
 .venv/
+venv/
+
+# Caches Python
 __pycache__/
 *.pyc
-init.cpython-313.pyc
-GAME/END/__pycache__/init.cpython-313.pyc
+
+# Editeurs
+.idea/
+.vscode/
+
+# Fichiers temporaires
+*.zip
+tempCodeRunnerFile.py

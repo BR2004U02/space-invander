@@ -7,7 +7,7 @@ import pygame
 import math
 
 from classes.entite import Entite
-from config import REFERENCE_FRAME
+from config.config import REFERENCE_FRAME
 
 
 class Bullet(Entite):

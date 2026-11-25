@@ -6,7 +6,7 @@ scoreX = 20
 scoreY = 50
 # position du score en dessous de la barre de vie
 
-def game_over(screen, score):
+def game_over_screen(screen, score):
     over_font = pygame.font.Font(None, 64)
     score_font = pygame.font.Font(None, 36)
 

@@ -1,12 +1,13 @@
+import pygame
 from classes.arme import Weapon
 from classes.fond import Fond
 from classes.score import Score
 from classes.barre_de_vie import BarreDeVie
 from classes.ennemi_manager import EnnemiManager
-from end.init import init_player, init_ennemy, charger_images
-from end.physique import collision_bullets_ennemies, collision_ennemi_bas
-from config import H_SCREEN
-
+from backend.init import init_player, init_ennemy, charger_images
+from backend.physique import collision_bullets_ennemies, collision_ennemi_bas
+from config.config import H_SCREEN
+from frontend.affichage import game_over_screen
 
 class Partie:
     """Regroupe tout l'état d'une partie en cours : fond, joueur, score, armes, ennemis."""
@@ -45,7 +46,8 @@ class Partie:
         self.ennemi_manager.ennemis.extend(
             init_ennemy(self.enemy_images, self.enemy_bullet_images, self.score.value)
         )
-
+        
+        self.game_over_screen = game_over_screen
     def update(self, dt):
         # Mise à jour du décor
         self.fond.update(dt)
@@ -125,3 +127,17 @@ class Partie:
                 self.barre_vie.perdre_vies(1)
                 self.sons.hit.play()
                 self.temps_invulnerable = self.delai_invulnerabilite
+                
+    def game_over(self,screen,sons):
+        if self.barre_vie.vies <= 0:
+            sons.stopper_musique()
+            sons.game_over.play()
+
+            self.fond.afficher(screen)
+            game_over_screen(screen, self.score.value)
+
+            pygame.display.flip()
+            pygame.time.wait(3000)
+
+            running = False
+            return True

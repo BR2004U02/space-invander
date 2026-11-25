@@ -1,6 +1,6 @@
 import pygame
 from classes.entite import Entite
-from config import REFERENCE_FRAME
+from config.config import REFERENCE_FRAME
 
 class Player:
     def __init__(self, x, y, speed, direction, vy, limite_droite):

@@ -1,6 +1,6 @@
 from classes.entite import Entite
 from classes.arme import EnemyWeapon
-from config import REFERENCE_FRAME
+from config.config import REFERENCE_FRAME
 
 class Ennemi:
     def __init__(self, x, y, speed, speed_down, limite_gauche, limite_droite, limite_bas, dh, dv):

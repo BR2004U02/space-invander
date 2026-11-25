@@ -2,8 +2,8 @@
 import pygame
 from classes.player import Avion,images_avion
 from classes.ennemi import Extra, EnnemiClassique, EnnemiRapide, EnnemiTireur # EnnemiBoss
-from asset_paths import BACKGROUND, PLAYER, ENEMY, PROJECTILE
-from config import L_SCREEN, H_SCREEN, PLAYER_WIDTH, PLAYER_HEIGHT, ENEMY_WIDTH, ENEMY_HEIGHT
+from config.asset_paths import BACKGROUND, PLAYER, ENEMY, PROJECTILE
+from config.config import L_SCREEN, H_SCREEN, PLAYER_WIDTH, PLAYER_HEIGHT, ENEMY_WIDTH, ENEMY_HEIGHT
 import random
 
 # Chargement unique des images utilisées plusieurs fois => optimisation des performances

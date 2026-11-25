@@ -4,85 +4,117 @@ Objets (classes) :
 
 | Classe | Fichier | Role | Attributs | Methodes |
 | --- | --- | --- | --- | --- |
-| Player | classes/player.py | base d'un joueur | x, y, speed, direction, vy, limite_droite | move(direction) |
-| Avion (herite de Player) | classes/player.py | joueur affiche a l'ecran | images (9 images), playerImg | changer_image(vies, direction), afficher(screen) |
-| Ennemi | classes/ennemi.py | base d'un ennemi | enemyX, enemyY, speed, speed_down, limites, dh, dv | move() |
-| Extra (herite de Ennemi) | classes/ennemi.py | ennemi affiche a l'ecran | enemyImg, hitbox | afficher(screen) |
-| Bullet | classes/arme.py | une balle | x, y, speed, state (ready / fire), hitbox | fire(x, y), update() |
-| Weapon | classes/arme.py | gere les tirs | bullets (liste), last_shot, shoot_delay | shoot_continuous(x, y), create_2_bullets(x, y), update() |
-| Sons | end/audio.py | musique + bruitages | explosion, hit, game_over | stopper_musique() |
-| Partie | jeu.py | etat d'une partie | background, joueur, vies, score, timers, weapons, ennemis | (aucune pour l'instant) |
+| Entite | classes/entite.py | base commune a tout objet affiche | x, y, image, hitbox | afficher(screen) |
+| Player | classes/player.py | base d'un joueur | x, y, speed, direction, vy, limite_droite | move(direction, dt) |
+| Avion (Player + Entite) | classes/player.py | vaisseau du joueur | images (9 images) | changer_image(vies, direction) |
+| Ennemi | classes/ennemi.py | deplacement d'un ennemi | x, y, speed, speed_down, limites, dh, dv | move(dt) |
+| Extra (Ennemi + Entite) | classes/ennemi.py | ennemi affiche a l'ecran | image, hitbox | afficher(screen) |
+| EnnemiClassique (Extra) | classes/ennemi.py | ennemi de base | vitesse 5 | — |
+| EnnemiRapide (Extra) | classes/ennemi.py | ennemi rapide | vitesse 9 | — |
+| EnnemiTireur (Extra) | classes/ennemi.py | ennemi qui tire | vitesse 2, weapon | update_tirs(dt, joueur) |
+| EnnemiManager | classes/ennemi_manager.py | gere la flotte | ennemis, spawn_timer, images | update(dt, joueur, score), afficher(screen), verifier_collisions(joueur) |
+| Bullet (Entite) | classes/arme.py | balle du joueur | speed 10, state | fire(x, y), update(dt), afficher(screen) |
+| EnemyBullet (Entite) | classes/arme.py | balle ennemie dirigee | speed 4, direction_x, direction_y | update(dt), afficher(screen) |
+| Weapon | classes/arme.py | arme du joueur | bullets, shoot_delay 600 ms | shoot_continuous(x, y), update(dt), afficher(screen) |
+| EnemyWeapon | classes/arme.py | arme d'un ennemi | bullets, shoot_delay 5000 ms | shoot(x, y, player), update(dt), afficher(screen) |
+| Fond | classes/fond.py | fond defilant | image, y1, y2 | update(dt), afficher(screen) |
+| Score | classes/score.py | score et bonus | value, timer, bonus_timer, bonus_alpha | update(dt), ajouter_points(n), afficher(screen) |
+| BarreDeVie | classes/barre_de_vie.py | vies du joueur | vies, max_vies, dimensions | perdre_vies(n), afficher(screen) |
+| Sons | backend/audio.py | musique et bruitages | explosion, hit, game_over | stopper_musique() |
+| Partie | backend/jeu.py | etat d'une partie | fond, joueur, score, barre_vie, weapons, ennemi_manager | appliquer_controles(), update(dt), dessiner(screen), gerer_collisions(), game_over() |
 
 Relations :
 
 ```mermaid
 classDiagram
+    Entite <|-- Avion
+    Entite <|-- Extra
+    Entite <|-- Bullet
+    Entite <|-- EnemyBullet
     Player <|-- Avion
     Ennemi <|-- Extra
-    Partie "1" o-- "1" Avion : joueur
-    Partie "1" o-- "1" Weapon : weapons
-    Partie "1" o-- "n" Extra : ennemis
-    Weapon "1" o-- "n" Bullet : bullets
+    Extra <|-- EnnemiClassique
+    Extra <|-- EnnemiRapide
+    Extra <|-- EnnemiTireur
+
+    Partie o-- Avion
+    Partie o-- Weapon
+    Partie o-- EnnemiManager
+    Partie o-- Fond
+    Partie o-- Score
+    Partie o-- BarreDeVie
+    EnnemiManager o-- Extra
+    EnnemiTireur o-- EnemyWeapon
+    Weapon o-- Bullet
+    EnemyWeapon o-- EnemyBullet
 ```
 
-- Partie contient 1 Avion, 1 Weapon et une liste d'Extra
-- Weapon contient une liste de Bullet
-- Sons est cree a part dans le main
+- Entite est la classe mere de tout ce qui s'affiche (position, image, hitbox)
+- Avion herite de Player (deplacement) ET de Entite (affichage)
+- Extra herite de Ennemi (deplacement) ET de Entite (affichage)
+- Les trois types d'ennemis heritent de Extra et changent vitesse / comportement
+- Partie compose les objets du jeu ; Sons est cree a part dans main
 
 Fichiers :
 
 - main.py : demarrage + boucle de jeu
-- jeu.py : classe Partie
-- classes/ : player.py, ennemi.py, arme.py
-- end/init.py : taille ecran, limites, creation du fond / joueur / ennemi / vies / score
-- end/affichage.py : afficher_score, afficher_vie, game_over
-- end/physique.py : collision_bullets_ennemies, collision_ennemi_bas
-- end/audio.py : classe Sons
-- asset_paths.py : chemins des images et des sons
+- backend/jeu.py : classe Partie
+- backend/init.py : chargement des images, creation du joueur et des ennemis
+- backend/physique.py : collisions balles-ennemis et ennemis-bas
+- backend/controle.py : lecture du clavier
+- backend/audio.py : classe Sons
+- classes/ : les objets du jeu
+- frontend/affichage.py : ecran de fin de partie
+- config/config.py : toutes les constantes
+- config/asset_paths.py : chemins des images et des sons
 
 Constante :
 
-- ecran : 1280 x 800, 60 images par seconde
-- joueur : 150 x 150 pixels, vitesse 8, 3 vies
-- ennemi : 80 x 80 pixels, vitesse 5, descente 1, apparition toutes les 500 ms
-- balle : vitesse 10, 2 balles par tir, 1 tir toutes les 600 ms
+- ecran : 1280 x 800, 60 images par seconde (REFERENCE_FRAME = 16.67 ms)
+- joueur : 150 x 150 pixels, vitesse 8, 3 vies, invulnerabilite 1000 ms
+- ennemi : 80 x 80 pixels, apparition toutes les 500 ms
+    - classique vitesse 5, rapide vitesse 9, tireur vitesse 2
+    - descente 1
+- balle joueur : vitesse 10, 2 balles par tir, 1 tir toutes les 600 ms
+- balle ennemie : vitesse 4, 1 tir toutes les 5000 ms, dirigee vers le joueur
 - score : +1 toutes les 50 ms, +50 par ennemi detruit
 - "+50" affiche pendant 1000 ms
-- fond : defile de 2 pixels par image
+- fond : defile de 2 pixels par image de reference
 - game over : ecran affiche 3000 ms
 
 Variable :
 
-- dt (temps ecoule depuis la derniere image)
-- direction du joueur (-1, 0, 1)
+- dt (temps ecoule depuis la derniere image, en ms)
+- direction du joueur (-1, 0, 1) et tir (vrai / faux)
 - vies, score
-- timers : spawn_timer, score_timer, bonus_timer
-- position du fond (background_y1, background_y2)
+- timers : spawn_timer, score_timer, bonus_timer, temps_invulnerable
+- position du fond (y1, y2)
 - listes : ennemis, bullets
+
+Apparition des ennemis selon le score :
+
+- moins de 2000 points : classique uniquement
+- de 2000 a 5000 points : 70% classique, 30% rapide
+- au-dela de 5000 points : 50% classique, 30% rapide, 20% tireur
 
 Deroulement :
 
 1. Demarrage
     - pygame.init() + creation de la fenetre
     - creation de Sons (la musique demarre)
-    - creation de Partie (fond, joueur, vies, score, arme, 1er ennemi)
+    - creation de Partie (images chargees une seule fois, fond, joueur, score,
+      barre de vie, arme, gestionnaire d'ennemis, 1er ennemi)
 
 2. Boucle de jeu (a chaque image)
     1. lire dt et les evenements (fermer la fenetre = fin)
-    2. score +1 si 50 ms ecoulees
-    3. faire defiler et afficher le fond
-    4. afficher le joueur
-    5. si 500 ms ecoulees : ajouter un ennemi
-    6. afficher et deplacer chaque ennemi
-    7. afficher le score
-    8. lire le clavier : gauche / droite = deplacer le joueur, espace = tirer
-    9. collision balle - ennemi : les deux disparaissent, score +50, afficher "+50"
-    10. collision ennemi - bas de l'ecran : l'ennemi disparait, -1 vie
-    11. choisir l'image de l'avion selon vies et direction
-    12. afficher la barre de vie
-    13. si vies <= 0 : Game Over (voir 3)
-    14. deplacer et afficher les balles
-    15. mettre l'ecran a jour
+    2. lire le clavier -> direction et tir
+    3. appliquer les controles : deplacer le joueur, choisir son image, tirer
+    4. update : fond, score, armes, ennemis (deplacement + tirs), invulnerabilite
+    5. collisions : balle-ennemi (+50 points), ennemi au bas de l'ecran (-1 vie),
+       balle ennemie-joueur (-1 vie)
+    6. dessiner : fond, joueur, ennemis, score, barre de vie
+    7. si vies <= 0 : Game Over (voir 3)
+    8. mettre l'ecran a jour
 
 3. Game Over
     - couper la musique + bruitage game over
@@ -95,3 +127,4 @@ Etat de l'avion :
 - 2 vies : damaged
 - 1 vie : critical
 - chaque etat a 3 images : droit, penche a gauche, penche a droite
+- clignotement pendant l'invulnerabilite
