@@ -49,3 +49,9 @@ REFERENCE_FRAME = 1000 / FPS # 16.67 ms par frame
 
 SHURIKEN_AMPLITUDE = 120    # largeur de la courbe, en pixels
 SHURIKEN_LONGUEUR = 80      # plus c'est grand, plus la courbe est étirée
+
+# Indication du changement d'arme (sous la barre de vie et le score)
+HINT_TEXT = "Flèche du haut : changer d'arme"
+HINT_FONT_SIZE = 22
+HINT_X = 20
+HINT_Y = 82

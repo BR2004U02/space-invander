@@ -7,7 +7,7 @@ from classes.barre_de_vie import BarreDeVie
 from classes.ennemi_manager import EnnemiManager
 from backend.init import init_player, init_ennemy, charger_images
 from backend.physique import collision_bullets_ennemies, collision_ennemi_bas
-from config.config import H_SCREEN
+from config.config import H_SCREEN, HINT_TEXT, HINT_FONT_SIZE, HINT_X, HINT_Y, WHITE
 from frontend.affichage import game_over_screen
 
 class Partie:
@@ -40,6 +40,9 @@ class Partie:
         self.armes = [Weapon(self.bullet_images), WeaponShuriken(self.shuriken_image)]
         self.index_arme = 0
         self.weapons = self.armes[0]          # l'arme en main
+
+        # Indication du changement d'arme (texte préparé une seule fois)
+        self.indication = pygame.font.Font(None, HINT_FONT_SIZE).render(HINT_TEXT, True, WHITE)
         # Ennemis
         self.ennemi_manager = EnnemiManager(
         self.enemy_images,
@@ -105,6 +108,9 @@ class Partie:
 
         # Barre de vie
         self.barre_vie.afficher(screen)
+
+        # Indication du changement d'arme
+        screen.blit(self.indication, (HINT_X, HINT_Y))
 
         # Projectiles
         for arme in self.armes:
