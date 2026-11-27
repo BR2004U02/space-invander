@@ -1,3 +1,8 @@
+# =============================================================================
+#  AFFICHAGE - ecran de fin de partie
+#  Seul affichage qui ne depend d'aucun objet du jeu.
+# =============================================================================
+
 import pygame
 
 score_value = 0
@@ -6,6 +11,8 @@ scoreX = 20
 scoreY = 50
 # position du score en dessous de la barre de vie
 
+
+# --- GAME OVER et score final, centres a l'ecran ---
 def game_over_screen(screen, score):
     over_font = pygame.font.Font(None, 64)
     score_font = pygame.font.Font(None, 36)

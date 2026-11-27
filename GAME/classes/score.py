@@ -1,3 +1,8 @@
+# =============================================================================
+#  SCORE
+#  Score qui monte avec le temps, plus un bonus a chaque ennemi detruit,
+#  affiche en vert et s'estompant progressivement.
+# =============================================================================
 
 import pygame
 
@@ -21,6 +26,7 @@ class Score:
         self.bonus_timer = 0
         self.bonus_alpha = 0
 
+    # --- Avance les deux minuteurs : score et bonus ---
     def update(self, dt):
         # Augmentation progressive du score
         self.timer += dt
@@ -38,12 +44,14 @@ class Score:
         else:
             self.bonus_alpha = 0
 
+    # --- Ennemis detruits : ajoute les points et declenche le bonus ---
     def ajouter_points(self, nombre_ennemis):
         self.value += nombre_ennemis * ENEMY_POINTS
 
         if nombre_ennemis > 0:
             self.bonus_timer = BONUS_DURATION
 
+    # --- Dessine le score, et le +50 tant qu'il n'a pas disparu ---
     def afficher(self, screen):
         score = self.font.render(
             "Score : " + str(self.value),

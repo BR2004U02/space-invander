@@ -1,6 +1,17 @@
+# =============================================================================
+#  ENNEMIS - deplacement, affichage et types
+#  Ennemi gere le deplacement, Extra y ajoute l'affichage, puis chaque type
+#  d'ennemi herite de Extra en ne changeant que ce qui le distingue.
+# =============================================================================
+
 from classes.entite import Entite
 from classes.arme import EnemyWeapon
 from config.config import REFERENCE_FRAME
+
+
+# =============================================================================
+#  DEPLACEMENT DE BASE
+# =============================================================================
 
 class Ennemi:
     def __init__(self, x, y, speed, speed_down, limite_gauche, limite_droite, limite_bas, dh, dv):
@@ -14,6 +25,7 @@ class Ennemi:
         self.dh = dh
         self.dv = dv
 
+    # --- Va-et-vient horizontal + descente progressive ---
     def move(self, dt):
 
         #G / D
@@ -35,6 +47,11 @@ class Ennemi:
         self.hitbox.y = self.y  
         
 
+
+# =============================================================================
+#  ENNEMI AFFICHABLE
+# =============================================================================
+
 class Extra(Ennemi, Entite): # ennemi pour les déplacements, entite pour l'image/hitbox/affichage
     def __init__(self, x, y, limite_gauche, limite_droite, limite_bas, enemyImg, dh, dv):
         Ennemi.__init__(
@@ -49,10 +66,19 @@ class Extra(Ennemi, Entite): # ennemi pour les déplacements, entite pour l'imag
 
 # Les différents ennemis (héritage depuis Extra)
 
+
+# =============================================================================
+#  LES DIFFERENTS TYPES D'ENNEMIS
+# =============================================================================
+
+# Chaque type ne redefinit que sa vitesse ou son comportement propre.
+
+# --- Ennemi de base : vitesse 5 ---
 class EnnemiClassique(Extra):
     pass
 
 
+# --- Plus rapide : vitesse 9 ---
 class EnnemiRapide(Extra):
     def __init__(self, x, y, limite_gauche, limite_droite,
                  limite_bas, enemyImg, dh, dv):
@@ -63,6 +89,7 @@ class EnnemiRapide(Extra):
         self.speed = 9
 
 
+# --- Lent, mais tire vers le joueur (composition : il possede une arme) ---
 class EnnemiTireur(Extra):
     def __init__(self, x, y, limite_gauche, limite_droite,
                  limite_bas, enemyImg, dh, dv, bullet_image):
@@ -73,6 +100,7 @@ class EnnemiTireur(Extra):
         self.speed = 2
         self.weapon = EnemyWeapon(bullet_image)
 
+    # --- Tire depuis le bas de l'ennemi, vers le joueur ---
     def update_tirs(self, dt, joueur):
         self.weapon.shoot(
             self.x + self.hitbox.width // 2,
@@ -85,5 +113,6 @@ class EnnemiTireur(Extra):
         super().afficher(screen)
         self.weapon.afficher(screen)
 
+# --- A IMPLEMENTER : boss resistant a plusieurs tirs ---
 class EnnemiBoss(Extra):
     pass

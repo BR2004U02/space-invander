@@ -1,3 +1,9 @@
+# =============================================================================
+#  CONTROLES - lecture du clavier
+#  Traduit les touches en intentions (direction, tir) : le reste du jeu
+#  ne connait donc jamais les touches elles-memes.
+# =============================================================================
+
 import pygame
 
 

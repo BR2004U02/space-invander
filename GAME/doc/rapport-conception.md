@@ -34,9 +34,9 @@ Ajouter un attribut — des points de vie, par exemple — impose de créer une 
 
 ## 2. Architecture proposée
 
-Le code est réparti en quatre packages aux responsabilités distinctes.
+Le projet est réparti en cinq dossiers aux responsabilités distinctes.
 
-| Package | Rôle |
+| Dossier | Rôle |
 | --- | --- |
 | `classes/` | Les objets du jeu : vaisseau, ennemis, projectiles, armes, score, barre de vie, fond |
 | `backend/` | La logique : état d'une partie, chargement des ressources, collisions, lecture du clavier, son |
@@ -58,7 +58,24 @@ Le code est réparti en quatre packages aux responsabilités distinctes.
 
 ## 3. Justification des choix
 
-**`Entite` comme racine de tout ce qui s'affiche.** Le vaisseau, les ennemis et les projectiles partagent exactement quatre données — une position, une image, une boîte de collision — et un comportement : se dessiner. Les rassembler dans une classe mère évite d'écrire quatre fois le même `afficher()` et garantit que tout objet possède une hitbox, condition nécessaire au fonctionnement des collisions.
+**Des classes choisies pour faciliter les implémentations.** Chaque élément du jeu est une classe qui regroupe ses caractéristiques et son affichage : pour modifier ou ajouter un élément, on sait quelle classe ouvrir, et tout ce qui le concerne s'y trouve. Ce regroupement est un choix assumé : séparer strictement l'affichage de chaque objet aurait doublé le nombre de classes sans rien apporter à un jeu de cette taille. Trois classes servent de points d'extension — `Entite` pour tout ce qui s'affiche, `Extra` pour tout ennemi, `Weapon` pour toute arme — et un nouvel élément s'obtient par héritage, en ne redéfinissant que ce qui le distingue. La seconde arme du joueur en est la preuve : `WeaponShuriken` tient en six lignes et ne redéfinit qu'une méthode.
+
+**Une arborescence organisée de manière claire.** Le nom du dossier donne le rôle, le nom du fichier donne l'objet :
+
+```text
+GAME/
+  main.py        point d'entrée : fenêtre et boucle de jeu
+  classes/       un fichier par objet du jeu : player, ennemi, arme, score, fond, barre de vie
+  backend/       logique : partie, initialisation, collisions, clavier, sons
+  frontend/      affichage qui ne dépend d'aucun objet : écran de fin
+  config/        constantes du jeu et chemins des ressources
+  assets/        images et sons, rangés par type
+  doc/           phases préparatoires, roadmap, rapport
+```
+
+Chaque modification a ainsi une adresse évidente : régler une vitesse se fait dans `config/config.py`, ajouter un ennemi dans `classes/ennemi.py`, changer une image dans `assets/`. Un autre groupe peut reprendre le projet sans lire tout le code.
+
+**`Entite` comme racine de tout ce qui s'affiche.** Le vaisseau, les ennemis et les projectiles partagent une position, une image, une boîte de collision et un comportement : se dessiner. Les rassembler dans une classe mère évite de réécrire le même `afficher()` dans chaque classe et garantit que tout objet possède une hitbox, condition nécessaire aux collisions.
 
 **Séparer le déplacement de l'affichage par héritage multiple.** `Player` décrit comment un vaisseau se déplace, `Ennemi` comment un ennemi patrouille et descend ; ni l'un ni l'autre ne sait s'afficher. `Avion` et `Extra` combinent chacun une logique de déplacement avec `Entite` :
 
@@ -69,21 +86,58 @@ class Extra(Ennemi, Entite):
         Entite.__init__(self, x, y, enemyImg)
 ```
 
-L'intérêt est de pouvoir faire varier les deux axes indépendamment : un nouvel ennemi change sa façon de bouger sans toucher à son affichage. Ce choix a un coût, discuté en section 5.
+Les deux axes varient ainsi indépendamment : un nouvel ennemi change sa façon de bouger sans toucher à son affichage.
 
-**`Partie` comme unique dépositaire de l'état.** Plutôt que de laisser la boucle manipuler une douzaine de variables, `Partie` compose les objets du jeu et n'expose que cinq méthodes. La boucle de `main.py` ne connaît donc ni le nombre de vies, ni la liste des ennemis, ni les timers — elle enchaîne des appels. C'est la composition, et non l'héritage, qui convient ici : une partie n'*est* pas un score, elle *possède* un score.
+**`Partie` regroupe l'état du jeu.** Plutôt que de laisser la boucle manipuler une douzaine de variables, `Partie` compose les objets du jeu — joueur, armes, ennemis, score, barre de vie, fond — et prend en charge leur mise à jour, les collisions et l'affichage. C'est la composition, et non l'héritage, qui convient ici : une partie n'*est* pas un score, elle *possède* un score.
 
-**Un gestionnaire dédié aux ennemis.** `EnnemiManager` concentre l'apparition, le déplacement et les tirs de la flotte. Sans lui, ces responsabilités seraient retombées dans `Partie`, qui serait redevenue le fourre-tout que la boucle initiale était déjà. Le gestionnaire permet aussi de faire dépendre la composition de la flotte du score, règle de difficulté qui n'a sa place ni dans `Partie` ni dans les classes d'ennemis.
+**Un gestionnaire dédié aux ennemis.** `EnnemiManager` concentre l'apparition, le déplacement et les tirs de la flotte. Sans lui, ces responsabilités seraient retombées dans `Partie`, qui serait redevenue le fourre-tout que la boucle initiale était déjà. Il permet aussi de faire dépendre la composition de la flotte du score, règle de difficulté qui n'a sa place ni dans `Partie` ni dans les classes d'ennemis.
 
-**Des fonctions, et non des classes, pour ce qui n'a pas d'état.** `physique.py` et `controle.py` contiennent des fonctions libres. Une collision est un calcul sans mémoire, la lecture du clavier interroge un périphérique unique : aucun des deux n'a de données à conserver entre deux appels. Les transformer en classes aurait ajouté une indirection sans rien apporter.
+**Des fonctions, et non des classes, pour ce qui n'a pas d'état.** `physique.py` et `controle.py` contiennent des fonctions libres. Une collision est un calcul sans mémoire, la lecture du clavier interroge un périphérique unique : aucun des deux n'a de données à conserver entre deux appels.
 
-**Des constantes centralisées.** `config/config.py` rassemble dimensions, vitesses, délais et couleurs. Équilibrer le jeu ne demande plus de parcourir cinq fichiers à la recherche de nombres isolés. La constante `REFERENCE_FRAME` — la durée d'une image à 60 ips — sert de référence à tous les déplacements, qui s'expriment désormais en `vitesse × (dt / REFERENCE_FRAME)` : la vitesse à l'écran est identique quelle que soit la machine.
+**Des constantes centralisées.** `config/config.py` rassemble dimensions, vitesses, délais et couleurs. La constante `REFERENCE_FRAME` — la durée d'une image à 60 images par seconde — sert de référence à tous les déplacements, qui s'expriment en `vitesse × (dt / REFERENCE_FRAME)` : la vitesse à l'écran est identique quelle que soit la machine.
 
 ---
 
 ## 4. Extensibilité
 
-**Ajouter un type d'ennemi** demande une sous-classe et rien d'autre :
+Ajouter un élément suit toujours la même démarche : une classe qui hérite, une image, une ligne pour l'enregistrer. Le reste du programme ne change pas.
+
+### 4.1 Ajouter une arme
+
+La seconde arme du joueur, qui lance des shurikens en courbe, a été ajoutée de cette façon.
+
+1. **Le projectile**, s'il se déplace autrement qu'une balle : une classe qui hérite de `Bullet` et redéfinit `update()`. La montée reste celle de `Bullet`, seule la courbe est ajoutée.
+2. **L'arme** : une classe qui hérite de `Weapon` et redéfinit la création des projectiles.
+3. **L'image**, chargée une seule fois dans `charger_images()`.
+4. **L'enregistrement** : une entrée dans la liste des armes de `Partie`.
+
+```python
+class Shuriken(Bullet):
+    def update(self, dt):
+        super().update(dt)                                   # la montée est celle de Bullet
+        distance = self.y_depart - self.y
+        self.x = self.x_depart + self.sens * SHURIKEN_AMPLITUDE * math.sin(distance / SHURIKEN_LONGUEUR)
+        self.hitbox.x = self.x
+
+class WeaponShuriken(Weapon):
+    def create_2_bullets(self, x, y):
+        for sens in (-1, 1):                                 # deux shurikens qui se croisent
+            shuriken = Shuriken(self.bullet_image, sens)
+            shuriken.fire(x + 45 - shuriken.hitbox.width // 2, y)
+            self.bullets.append(shuriken)
+```
+
+```python
+self.armes = [Weapon(self.bullet_images), WeaponShuriken(self.shuriken_image)]   # dans Partie
+```
+
+Le délai entre deux tirs, la suppression des projectiles sortis de l'écran, l'affichage et les collisions sont hérités de `Weapon` : rien n'a été réécrit. `Partie` parcourt la liste `armes` pour les mettre à jour, et la flèche du haut passe à l'arme suivante de cette liste. Une troisième arme entre donc dans la rotation sans autre modification.
+
+### 4.2 Ajouter un ennemi
+
+1. **La classe**, dans `classes/ennemi.py` : elle hérite de `Extra` et ne change que ce qui la distingue.
+2. **L'image**, ajoutée au dictionnaire `enemy_images` de `charger_images()`.
+3. **L'enregistrement**, dans `init_ennemy()` : le nom du type dans le dictionnaire `classes_ennemis`, et son poids dans le tirage au sort selon le score.
 
 ```python
 class EnnemiRapide(Extra):
@@ -92,44 +146,25 @@ class EnnemiRapide(Extra):
         self.speed = 9
 ```
 
-`EnnemiManager` itère sur `self.ennemis` sans connaître les types concrets ; aucune de ses lignes ne change. C'est la vérification faite en pratique : `EnnemiTireur` a été ajouté après coup, avec sa propre arme et un comportement de tir dirigé, sans modifier `main.py` ni `Partie`.
+`EnnemiManager` déplace et affiche tous les ennemis de sa liste sans connaître leur type : aucune de ses lignes ne change, pas plus que les collisions. Un ennemi peut aussi recevoir un comportement par composition : `EnnemiTireur` possède sa propre arme, `EnemyWeapon`, qui tire vers la position du joueur.
 
-**Ajouter une arme** suit le même principe. `Weapon` expose `shoot_continuous()` et `update()` ; une sous-classe qui redéfinit la création des projectiles obtient un comportement différent sans que l'appelant s'en aperçoive :
+### 4.3 Ajouter un style de joueur
 
-```python
-class WeaponEventail(Weapon):
-    def create_2_bullets(self, x, y):
-        for decalage in (-40, 0, 40):
-            bullet = Bullet(self.bullet_image)
-            bullet.fire(x + decalage, y)
-            self.bullets.append(bullet)
-```
+Un nouveau vaisseau reprend la même démarche. Par exemple, un chasseur plus rapide :
 
-**Faire varier un projectile** se fait au niveau de `Entite`. `EnemyBullet` se distingue de `Bullet` par un vecteur de direction calculé au moment du tir vers la position du joueur ; les deux restent des `Entite` et sont affichés par le même mécanisme.
-
-**Modifier l'équilibrage** ne touche qu'un fichier. Changer la cadence de tir, la vitesse des ennemis ou les points par ennemi détruit se fait dans `config.py`, sans ouvrir une seule classe.
-
----
-
-## 5. Limites
-
-**Le polymorphisme est contourné là où il devrait s'appliquer.** `EnnemiManager` teste la présence d'une méthode plutôt que de l'appeler :
+1. **Les images** : un dictionnaire sur le modèle de `images_avion`, soit trois états (normal, endommagé, critique) fois trois inclinaisons.
+2. **La classe**, dans `classes/player.py` : elle hérite de `Avion` et modifie ses caractéristiques.
+3. **La création**, dans `init_player()`, qui charge ces images et instancie la classe choisie.
 
 ```python
-if hasattr(ennemi, "update_tirs"):
-    ennemi.update_tirs(dt, joueur)
+class Chasseur(Avion):
+    def __init__(self, x, y, direction, vy, limite_droite, images):
+        super().__init__(x, y, direction, vy, limite_droite, images)
+        self.speed = 12
 ```
 
-Chaque nouveau comportement optionnel ajouterait un test du même genre. Le correctif consiste à définir `update_tirs()` vide dans `Extra` et à l'appeler sans condition : les ennemis qui ne tirent pas héritent d'un comportement neutre. Le même défaut affecte `verifier_collisions()`, qui teste `hasattr(ennemi, "weapon")`.
+Le déplacement et ses limites viennent de `Player`, le changement d'image selon les vies et l'inclinaison vient de `Avion`, l'affichage et la hitbox viennent de `Entite`. Le reste du jeu manipule un joueur sans savoir de quel vaisseau il s'agit.
 
-**La séparation entre logique et affichage reste incomplète.** Les classes métier portent toutes une méthode `afficher()`, et `backend/jeu.py` importe `frontend.affichage` pour l'écran de fin. Une partie ne peut donc pas être simulée sans Pygame. La correction passerait par des fonctions d'affichage recevant les objets en paramètre, les classes se limitant à leurs données.
+### 4.4 Modifier l'équilibrage
 
-**L'héritage multiple est fragile.** `Avion(Player, Entite)` et `Extra(Ennemi, Entite)` imposent d'appeler explicitement les deux constructeurs dans le bon ordre, `super()` ne suffisant plus. Une composition — un attribut `sprite` contenant l'`Entite` — serait plus robuste, au prix d'une indirection supplémentaire à chaque accès.
-
-**La résistance des ennemis n'est pas implémentée.** Tous meurent au premier tir. `EnnemiBoss` existe mais est une classe vide. Un attribut `resistance` dans `Ennemi`, décrémenté à chaque collision plutôt que de supprimer l'ennemi immédiatement, suffirait à l'introduire.
-
-**Le joueur ne dispose que d'une arme.** La seconde arme du jeu, `EnemyWeapon`, appartient aux ennemis. L'exemple de la section 4 montre que l'ajout est direct, mais il n'est pas fait.
-
-**La création des ennemis connaît tous les types.** `init_ennemy()` contient un dictionnaire associant un nom à chaque classe, plus un cas particulier pour l'ennemi tireur, dont le constructeur prend un argument de plus. Ajouter un type impose donc de modifier cette fonction. Un registre où chaque classe s'enregistre elle-même, et une signature uniforme pour tous les constructeurs, supprimeraient ce point de passage obligé.
-
-**Il n'existe pas de gestion d'états.** Le jeu démarre directement sur une partie et se ferme au game over. Un menu, une pause ou la possibilité de rejouer supposeraient une classe `Game` orchestrant plusieurs états, dont `Partie` ne serait qu'un.
+Changer la cadence de tir, la vitesse des ennemis, la courbe des shurikens ou les points par ennemi détruit se fait dans `config/config.py`, sans ouvrir une seule classe.

@@ -1,3 +1,9 @@
+# =============================================================================
+#  POINT D'ENTREE DU JEU
+#  Cree la fenetre puis deroule la boucle de jeu : lire les touches,
+#  mettre a jour, afficher. Toute la logique est dans Partie.
+# =============================================================================
+
 import pygame
 from backend.jeu import Partie
 from backend.audio import Sons
@@ -31,12 +37,15 @@ def main():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 partie.changer_arme()
 
+        # Un appui = un seul changement d'arme (contrairement a get_pressed,
+        # qui se repete tant que la touche reste enfoncee).
         ## ----------- GESTION DEPLACEMENT JOUEUR -----------
         keys = pygame.key.get_pressed()  # gestion des touches
 
         # Deplacement  + tir
         direction, tir = lire_clavier()
 
+        # Deplacement, image selon les degats, puis tir
         partie.joueur.move(direction, dt)
 
         partie.joueur.changer_image(partie.barre_vie.vies, direction)
@@ -47,6 +56,8 @@ def main():
         ## ----------- MISE A JOUR ET AFFICHAGE -----------
         partie.update(dt)
 
+        # On dessine AVANT de tester le game over, sinon l'ecran de fin
+        # serait recouvert par l'image suivante.
         ## ----------- GAME OVER -----------
         partie.dessiner(screen)
         if partie.game_over(screen, sons):

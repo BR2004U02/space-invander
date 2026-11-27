@@ -1,3 +1,10 @@
+# =============================================================================
+#  ARMES ET PROJECTILES
+#  Deux familles : les projectiles (ce qui vole) et les armes (ce qui les
+#  cree a une certaine cadence). Le joueur dispose de deux armes, les
+#  ennemis tireurs d'une troisieme.
+# =============================================================================
+
 # arme + balle
 # recuperer la position du canon  pour y tirer la balle correctement positionné
 # bonus tirer grace a la souris + viser
@@ -10,12 +17,19 @@ from classes.entite import Entite
 from config.config import REFERENCE_FRAME, SHURIKEN_AMPLITUDE, SHURIKEN_LONGUEUR
 
 
+
+# =============================================================================
+#  PROJECTILES DU JOUEUR
+# =============================================================================
+
+# --- Balle classique : monte tout droit ---
 class Bullet(Entite):
     def __init__(self, image):
         super().__init__(0, 0, image)
         self.speed = 10
         self.state = "ready"
 
+    # --- Place la balle au canon et la met en vol ---
     def fire(self, x, y):
         if self.state == "ready":
             self.x = x
@@ -23,6 +37,7 @@ class Bullet(Entite):
             self.hitbox.topleft = (self.x, self.y)
             self.state = "fire"
 
+    # --- Montee, puis disparition une fois sortie par le haut ---
     def update(self, dt):
         if self.state == "fire":
             self.y -= self.speed * (dt / REFERENCE_FRAME)
@@ -36,6 +51,12 @@ class Bullet(Entite):
             super().afficher(screen)
 
 
+
+# =============================================================================
+#  PROJECTILE ENNEMI
+# =============================================================================
+
+# --- Vise le joueur au moment du tir, puis garde sa direction ---
 class EnemyBullet(Entite):  # va vers la position du joueur lors du tir
     def __init__(self, image, x, y, target_x, target_y):
         super().__init__(x, y, image)
@@ -65,6 +86,12 @@ class EnemyBullet(Entite):  # va vers la position du joueur lors du tir
         super().afficher(screen)
 
 
+
+# =============================================================================
+#  ARMES DU JOUEUR
+# =============================================================================
+
+# --- Arme de base : 2 balles droites, une cadence ---
 class Weapon:
     def __init__(self, bullet_image):
 
@@ -74,6 +101,7 @@ class Weapon:
         self.last_shot = 0
         self.shoot_delay = 600  # firerate (en millisecondes)
 
+    # --- Cree les projectiles : SEULE methode redefinie par les sous-classes ---
     def create_2_bullets(self, x, y):
 
         bullet1 = Bullet(self.bullet_image)
@@ -85,6 +113,7 @@ class Weapon:
         self.bullets.append(bullet1)
         self.bullets.append(bullet2)
 
+    # --- Minuteur : ne tire que si le delai est ecoule ---
     def shoot_continuous(self, x, y):
         current_time = pygame.time.get_ticks()
 
@@ -92,6 +121,7 @@ class Weapon:
             self.create_2_bullets(x, y)
             self.last_shot = current_time
 
+    # --- Fait avancer les balles et retire celles qui sont sorties ---
     def update(self, dt):
         for bullet in self.bullets[:]:
             bullet.update(dt)
@@ -103,6 +133,8 @@ class Weapon:
             bullet.afficher(screen)
 
 
+
+# --- Shuriken : meme montee que Bullet, mais en suivant une courbe ---
 class Shuriken(Bullet):
     """Monte comme une balle, mais en suivant une courbe."""
 
@@ -112,6 +144,7 @@ class Shuriken(Bullet):
         self.x_depart = 0
         self.y_depart = 0
 
+    # --- Memorise le point de depart, pour calculer la courbe ---
     def fire(self, x, y):
         super().fire(x, y)
         self.x_depart = x
@@ -124,13 +157,22 @@ class Shuriken(Bullet):
         self.hitbox.x = self.x
 
 
+
+# --- Seconde arme : 2 shurikens qui se croisent ---
 class WeaponShuriken(Weapon):
+    # --- Deux shurikens, un vers la gauche et un vers la droite ---
     def create_2_bullets(self, x, y):
         for sens in (-1, 1):          # deux shurikens qui se croisent
             shuriken = Shuriken(self.bullet_image, sens)
             shuriken.fire(x + 45 - shuriken.hitbox.width // 2, y)   # centre de l'avion
             self.bullets.append(shuriken)
 
+
+# =============================================================================
+#  ARME DES ENNEMIS
+# =============================================================================
+
+# --- Tir lent et dirige vers le joueur ---
 class EnemyWeapon:
     def __init__(self, bullet_image):
         self.bullet_image = bullet_image

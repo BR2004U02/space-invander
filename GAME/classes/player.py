@@ -1,6 +1,17 @@
+# =============================================================================
+#  JOUEUR - deplacement et apparence du vaisseau
+#  Player gere le deplacement, Avion y ajoute l'image et son changement
+#  selon les vies restantes et l'inclinaison.
+# =============================================================================
+
 import pygame
 from classes.entite import Entite
 from config.config import REFERENCE_FRAME
+
+
+# =============================================================================
+#  DEPLACEMENT DU VAISSEAU
+# =============================================================================
 
 class Player:
     def __init__(self, x, y, speed, direction, vy, limite_droite):
@@ -11,11 +22,18 @@ class Player:
         self.vy = vy  # deplacement animation
         self.limite_droite = limite_droite
 
+    # --- Deplacement horizontal, borne aux limites de l'ecran ---
     def move(self, direction, dt):
         self.x += self.speed * direction * (dt / REFERENCE_FRAME)
         self.x = max(0, min(self.x, self.limite_droite))
         self.hitbox.x = self.x
         
+
+# =============================================================================
+#  LES 9 IMAGES DU VAISSEAU
+# =============================================================================
+
+# 3 etats de degats (normal / damaged / critical) x 3 inclinaisons.
 images_avion = {
         "normal": "player.png",
         "normal_left": "player_tilt_left.png",
@@ -30,12 +48,18 @@ images_avion = {
         "critical_right": "player_critical_tilt_right.png"
     }
 
+
+# =============================================================================
+#  LE VAISSEAU AFFICHABLE
+# =============================================================================
+
 class Avion(Player, Entite):
     def __init__(self, x, y, direction, vy, limite_droite, images):
         Player.__init__(self, x, y, 8, direction, vy, limite_droite)
         self.images = images
         Entite.__init__(self, x, y, images["normal"])
 
+    # --- Choisit l'image selon les vies et la direction ---
     def changer_image(self, vies, direction):
         if vies >= 3:
             etat = "normal"

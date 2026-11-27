@@ -1,3 +1,8 @@
+# =============================================================================
+#  INITIALISATION - chargement des ressources et creation des objets
+#  Les images sont chargees UNE SEULE FOIS au demarrage : les recharger a
+#  chaque image du jeu faisait chuter le nombre d'images par seconde.
+# =============================================================================
 
 import pygame
 from classes.player import Avion,images_avion
@@ -7,6 +12,11 @@ from config.config import L_SCREEN, H_SCREEN, PLAYER_WIDTH, PLAYER_HEIGHT, ENEMY
 import random
 
 # Chargement unique des images utilisées plusieurs fois => optimisation des performances
+
+# =============================================================================
+#  CHARGEMENT DES IMAGES (une seule fois)
+# =============================================================================
+
 def charger_images():
 
     enemy_images = {
@@ -40,6 +50,11 @@ def charger_images():
     return enemy_images, bullet_img, enemy_bullet_img, shuriken_img
 
 # Initialisation du jeu
+
+# =============================================================================
+#  CREATION DU DECOR
+# =============================================================================
+
 def init_game():
     # La fenetre est creee par main() : ici on ne charge que le fond.
     background = pygame.image.load(BACKGROUND + "/background.png").convert()
@@ -47,6 +62,11 @@ def init_game():
     return background
 
 # Initialisation du joueur
+
+# =============================================================================
+#  CREATION DU JOUEUR
+# =============================================================================
+
 def init_player():
 
     images_chargees = {}
@@ -68,6 +88,11 @@ def init_player():
     return joueur
 
 # Initialisation des différents ennemis
+
+# =============================================================================
+#  CREATION D'UN ENNEMI
+# =============================================================================
+
 def init_ennemy(enemy_images, enemy_bullet_image, score):
     limite_gauche = 0
     limite_droite = L_SCREEN - ENEMY_WIDTH
@@ -78,6 +103,7 @@ def init_ennemy(enemy_images, enemy_bullet_image, score):
     direction = random.choice([-1, 1])
     vitesse_descente = 1
 
+    # --- Le type depend du score : le jeu se corse en avancant ---
     if score < 2000: # 70% classique | 30% rapide
         type_ennemi = "classique"
 
@@ -93,6 +119,7 @@ def init_ennemy(enemy_images, enemy_bullet_image, score):
             weights=[50, 30, 20]
         )[0]
 
+    # --- Nom du type -> classe correspondante ---
     classes_ennemis = {
         "classique": EnnemiClassique,
         "rapide": EnnemiRapide,
@@ -100,6 +127,7 @@ def init_ennemy(enemy_images, enemy_bullet_image, score):
         # "boss": EnnemiBoss
     }
 
+    # --- Le tireur demande une image de projectile en plus ---
     if type_ennemi == "tireur":
         ennemi = EnnemiTireur(
             x, y,

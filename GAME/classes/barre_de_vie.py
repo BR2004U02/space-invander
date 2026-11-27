@@ -1,3 +1,8 @@
+# =============================================================================
+#  BARRE DE VIE
+#  Vies restantes du joueur et leur affichage en haut a gauche.
+# =============================================================================
+
 import pygame
 
 from config.config import (
@@ -23,9 +28,11 @@ class BarreDeVie:
         self.x = LIFE_BAR_X
         self.y = LIFE_BAR_Y
 
+    # --- Retire des vies ---
     def perdre_vies(self, nombre):
         self.vies -= nombre
 
+    # --- Trois rectangles : fond rouge, vie verte, contour blanc ---
     def afficher(self, screen):
         pygame.draw.rect( # rectangle 
             screen, RED,

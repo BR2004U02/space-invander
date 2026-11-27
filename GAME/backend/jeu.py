@@ -1,3 +1,9 @@
+# =============================================================================
+#  PARTIE - etat et regles d'une partie en cours
+#  Regroupe tous les objets du jeu et expose quatre etapes a la boucle :
+#  changer_arme(), update(), dessiner() et game_over().
+# =============================================================================
+
 import pygame
 from classes.arme import Weapon
 from classes.arme import Weapon, WeaponShuriken
@@ -12,6 +18,11 @@ from frontend.affichage import game_over_screen
 
 class Partie:
     """Regroupe tout l'état d'une partie en cours : fond, joueur, score, armes, ennemis."""
+
+
+# =============================================================================
+#  CREATION DE LA PARTIE
+# =============================================================================
 
     def __init__(self, sons):
 
@@ -53,12 +64,24 @@ class Partie:
         )
         
         
+
+# =============================================================================
+#  CHANGEMENT D'ARME (fleche du haut)
+# =============================================================================
+
+    # Passe a l'arme suivante de la liste. Les projectiles deja tires
+    # continuent leur course : toutes les armes restent mises a jour.
     def changer_arme(self):
         self.index_arme = (self.index_arme + 1) % len(self.armes)
         self.weapons = self.armes[self.index_arme]  
         self.game_over_screen = game_over_screen
         
         
+
+# =============================================================================
+#  MISE A JOUR : tout ce qui bouge, a chaque image
+# =============================================================================
+
     def update(self, dt):
         # Mise à jour du décor
         self.fond.update(dt)
@@ -82,6 +105,11 @@ class Partie:
         # Gestion des collisions
         self.gerer_collisions()
 
+
+
+# =============================================================================
+#  AFFICHAGE : dessine dans l'ordre, du fond vers l'avant
+# =============================================================================
 
     def dessiner(self, screen):
         # Décor
@@ -116,6 +144,11 @@ class Partie:
         for arme in self.armes:
             arme.afficher(screen)
 
+
+# =============================================================================
+#  COLLISIONS
+# =============================================================================
+
     def gerer_collisions(self):
         # Collision entre les projectiles et les ennemis
         ennemis_detruits = 0
@@ -146,6 +179,12 @@ class Partie:
                 self.sons.hit.play()
                 self.temps_invulnerable = self.delai_invulnerabilite
                 
+
+# =============================================================================
+#  FIN DE PARTIE
+# =============================================================================
+
+    # Retourne True quand les vies tombent a zero, pour sortir de la boucle.
     def game_over(self,screen,sons):
         if self.barre_vie.vies <= 0:
             sons.stopper_musique()

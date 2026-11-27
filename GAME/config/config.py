@@ -1,3 +1,9 @@
+# =============================================================================
+#  CONFIGURATION - toutes les constantes du jeu
+#  Un seul endroit pour equilibrer le jeu : tailles, vitesses, delais,
+#  couleurs. Aucune valeur en dur ne devrait rester dans les classes.
+# =============================================================================
+
 # Constantes utilisées dans le code du jeu
 
 # Dimensions de la fenêtre
@@ -47,6 +53,7 @@ GREEN = (0, 255, 0)
 FPS = 60
 REFERENCE_FRAME = 1000 / FPS # 16.67 ms par frame
 
+# Shurikens (seconde arme du joueur)
 SHURIKEN_AMPLITUDE = 120    # largeur de la courbe, en pixels
 SHURIKEN_LONGUEUR = 80      # plus c'est grand, plus la courbe est étirée
 
